@@ -39,6 +39,50 @@ app.get("/todos", async (req, res) => {
   }
 });
 
+//GET A SINGLE TODO
+app.get("/todos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const todo = await pool.query("SELECT *  FROM todo WHERE todo_id = $1", [
+      id,
+    ]);
+    res.json(todo.rows);
+  } catch (err) {
+    console.log(`Ups there was an error: ${err}`);
+    res.json(err.message);
+  }
+});
+
+//UPDATE A TODO
+app.patch("/todos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { desc } = req.body;
+    const updatedTodo = await pool.query(
+      "UPDATE todo SET description = $1 WHERE todo_id = $2",
+      [desc, id]
+    );
+    res.json("Todo was updated");
+  } catch (err) {
+    console.log(`Ups there was an error: ${err}`);
+    res.json(err.message);
+  }
+});
+
+//DELETE TODO
+app.delete("/todos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedTodo = await pool.query(
+      "DELETE FROM todo WHERE todo_id = $1",
+      [id]
+    );
+    res.json("Todo was deleted");
+  } catch (err) {
+    console.log(`Ups there was an error: ${err}`);
+    res.json(err.message);
+  }
+});
 //start up
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
